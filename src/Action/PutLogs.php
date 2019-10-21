@@ -6,10 +6,10 @@ class PutLogs extends \Swango\Aliyun\Log\Client {
      * Put logs to Log Service.
      * Unsuccessful opertaion will cause an Exception.
      *
-     * @param \AliYun\Log\Models\Request\PutLogs $request
+     * @param \Swango\Aliyun\Log\Models\Request\PutLogs $request
      *            the PutLogs request parameters class
-     * @throws \AliYun\Log\Exception
-     * @return \AliYun\Log\Models\Response\PutLogs
+     * @throws \Swango\Aliyun\Log\Exception
+     * @return \Swango\Aliyun\Log\Models\Response\PutLogs
      */
     public function execute(\Swango\Aliyun\Log\Models\Request\PutLogs $request): \Swango\Aliyun\Log\Models\Response\PutLogs {
         if (count($request->getLogitems()) > 4096)

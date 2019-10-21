@@ -70,7 +70,7 @@ class GetLogs extends \Swango\Aliyun\Log\Models\Response {
     /**
      * Get all logs from the response
      *
-     * @return AliYun\Log\Models\QueriedLog[]
+     * @return Swango\Aliyun\Log\Models\QueriedLog[]
      */
     public function getLogs(): array {
         return $this->logs;

@@ -2,7 +2,7 @@
 namespace Swango\Aliyun\Log;
 class Statement implements \Iterator, \Countable {
     private $client, $finished, $current, $load_all_data, $position;
-    public function __construct(\AliYun\action\GetLogs $client) {
+    public function __construct(Action\GetLogs $client) {
         $this->client = $client;
         $this->finished = false;
         $this->load_all_data = new \SplQueue();
