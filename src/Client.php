@@ -155,7 +155,7 @@ class Client extends \BaseClient {
         $headers['x-log-signaturemethod'] = 'hmac-sha1';
         if (strlen($this->stsToken) > 0)
             $headers['x-acs-security-token'] = $this->stsToken;
-        $headers['Date'] = $this->GetGMT();
+        $headers['Date'] = $this->getGMT();
         ksort($params);
         $signature = Util::getRequestAuthorization($method, $resource, self::$accessKey, $this->stsToken, $params,
             $headers);

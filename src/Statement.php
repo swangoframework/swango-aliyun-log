@@ -77,6 +77,8 @@ class Statement implements \Iterator, \Countable {
         }
     }
     public function count() {
+        if ($this->load_all_data->isEmpty())
+            $this->rewind();
         return $this->load_all_data->count();
     }
 }
