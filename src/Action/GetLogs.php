@@ -21,7 +21,7 @@ class GetLogs extends \Swango\Aliyun\Log\Client {
             $params['line'] = $request->getLine();
         if ($request->getOffset() !== null)
             $params['offset'] = $request->getOffset();
-        if ($request->getOffset() !== null)
+        if ($request->getReverse() !== null)
             $params['reverse'] = $request->getReverse() ? 'true' : 'false';
         $logstore = $request->getLogstore() ?? '';
         $project = $request->getProject() ?? '';
