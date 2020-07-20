@@ -2,7 +2,7 @@
 namespace Swango\Aliyun\Log\Action;
 use Swango\Environment;
 
-class GetLogDashboardUrl extends \BaseClient {
+class GetLogSearchUrl extends \BaseClient {
     protected const METHOD = 'GET', HOST = 'signin.aliyun.com', PATH = '/federation';
     private $AccessKeySecret, $AccessKeyId, $SecurityToken;
     private static $access_key_id, $access_secret, $role_arn, $region_id, $login_url_for_dashboard;
@@ -43,7 +43,7 @@ class GetLogDashboardUrl extends \BaseClient {
             \Swlib\Archer::task('\\cache::setex',
                 [
                     'AliYunSTSTokens',
-                    3600 - 5,
+                    3000,
                     \Json::encode(
                         [
                             $this->AccessKeySecret,
@@ -67,25 +67,27 @@ class GetLogDashboardUrl extends \BaseClient {
         $this->sendHttpRequest();
         return $this;
     }
-    public function getUrl(string $dashboard, array $filters = []): string {
+    public function getUrl(string $search, string $queryString = ''): string {
         $resp = \Json::decodeAsObject($this->recv()->getBody());
         if (! property_exists($resp, 'SigninToken') || ! is_string($resp->SigninToken))
             throw new \ApiErrorException('AliYun Log Service get SigninToken error');
 
-        $filters_string = '';
-        if (! empty($filters)) {
-            foreach ($filters as $key=>$value)
-                $filters_string .= '&' . http_build_query(
-                    [
-                        'filters' => "$key:$value"
-                    ]);
-        }
         $project = \Swango\Aliyun\Log\Gateway::getDefaultProject() ?? '';
         return 'https://signin.aliyun.com/federation?' . http_build_query(
             [
                 'Action' => 'Login',
                 'LoginUrl' => self::$login_url_for_dashboard,
-                'Destination' => "https://sls4service.console.aliyun.com/next/project/$project/dashboard/$dashboard?isShare=true&hideTopbar=true&hideSidebar=true&readOnly=true&hiddenBack=true{$filters_string}",
+                'Destination' => "https://sls4service.console.aliyun.com/next/project/$project/logsearch/$search?" . http_build_query(
+                    [
+                        'hideSidebar' => 'true',
+                        'hiddenBack' => 'true',
+                        'hideTopbar' => 'true',
+                        'readOnly' => 'true',
+                        'hiddenEtl' => 'true',
+                        'theme' => 'dark',
+                        'queryString' => base64_encode($queryString),
+                        'encode' => 'base64'
+                    ]),
                 'SigninToken' => $resp->SigninToken
             ]);
     }
