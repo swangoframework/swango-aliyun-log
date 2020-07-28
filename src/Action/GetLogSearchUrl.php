@@ -67,27 +67,43 @@ class GetLogSearchUrl extends \BaseClient {
         $this->sendHttpRequest();
         return $this;
     }
-    public function getUrl(string $search, string $queryString = ''): string {
+    public function getUrl(string $search, string $queryString = null, ?int $queryTimeType = null, $startTime = null,
+        $endTime = null): string {
         $resp = \Json::decodeAsObject($this->recv()->getBody());
         if (! property_exists($resp, 'SigninToken') || ! is_string($resp->SigninToken))
             throw new \ApiErrorException('AliYun Log Service get SigninToken error');
 
         $project = \Swango\Aliyun\Log\Gateway::getDefaultProject() ?? '';
+
+        $url_query_arr = [
+            'hideSidebar' => 'true',
+            'hiddenBack' => 'true',
+            'hideTopbar' => 'true',
+            'readOnly' => 'true',
+            'hiddenEtl' => 'true',
+            'theme' => 'dark'
+        ];
+        if (isset($queryString) && '' !== $queryString) {
+            $url_query_arr['queryString'] = base64_encode($queryString);
+            $url_query_arr['encode'] = 'base64';
+        }
+        if (isset($queryTimeType)) {
+            $url_query_arr['queryTimeType'] = $queryTimeType;
+        }
+        if (isset($startTime)) {
+            $url_query_arr['startTime'] = $startTime;
+        }
+        if (isset($endTime)) {
+            $url_query_arr['endTime'] = $endTime;
+        }
+
+        $url_query = http_build_query($url_query_arr);
+
         return 'https://signin.aliyun.com/federation?' . http_build_query(
             [
                 'Action' => 'Login',
                 'LoginUrl' => self::$login_url_for_dashboard,
-                'Destination' => "https://sls4service.console.aliyun.com/next/project/$project/logsearch/$search?" . http_build_query(
-                    [
-                        'hideSidebar' => 'true',
-                        'hiddenBack' => 'true',
-                        'hideTopbar' => 'true',
-                        'readOnly' => 'true',
-                        'hiddenEtl' => 'true',
-                        'theme' => 'dark',
-                        'queryString' => base64_encode($queryString),
-                        'encode' => 'base64'
-                    ]),
+                'Destination' => "https://sls4service.console.aliyun.com/next/project/$project/logsearch/$search?$url_query",
                 'SigninToken' => $resp->SigninToken
             ]);
     }
