@@ -10,23 +10,41 @@ abstract class Gateway {
 
         return self::$project;
     }
+    private static function buildSearchKV(string $key, string $value) {
+        if (strpos($value, ' ') === false)
+            return "$key:$value";
+        return $key . ':"' . $value . '"';
+    }
     public static function buildSearchForAliyunLogQuery(array $where): string {
         $parts = [];
         foreach ($where as $key=>&$value)
             if (is_array($value)) {
                 $count = count($value);
                 if ($count === 1) {
-                    $parts[] = "$key:" . str_replace(' ', '\ ', current($value));
+                    $parts[] = self::buildSearchKV($key, current($value));
                 } elseif ($count > 1) {
-                    $parts2 = [];
-                    foreach ($value as &$v2) {
-                        $parts2[] = "$key:" . str_replace(' ', '\ ', $v2);
+                    if (strpos($key, 'NOT ') === 0) {
+                        $key = substr($key, 4);
+                        $parts2 = [];
+                        foreach ($value as &$v2) {
+                            $parts2[] = self::buildSearchKV($key, $v2);
+                        }
+                        unset($v2);
+                        $parts[] = 'NOT (' . implode(' OR ', $parts2) . ')';
+                    } else {
+                        $parts2 = [];
+                        foreach ($value as &$v2) {
+                            $parts2[] = self::buildSearchKV($key, $v2);
+                        }
+                        unset($v2);
+                        $parts[] = '(' . implode(' OR ', $parts2) . ')';
                     }
-                    unset($v2);
-                    $parts[] = '(' . implode(' OR ', $parts2) . ')';
                 }
-            } else
-                $parts[] = "$key:" . str_replace(' ', '\ ', $value);
+            } elseif ($value instanceof SearchBuild) {
+                $parts[] = $value->build();
+            } else {
+                $parts[] = self::buildSearchKV($key, $value);
+            }
         if (empty($parts))
             return '*';
         return implode(' AND ', $parts);
