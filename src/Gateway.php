@@ -41,7 +41,7 @@ abstract class Gateway {
                     }
                 }
             } elseif ($value instanceof SearchBuild) {
-                $parts[] = $value->build();
+                $parts[] = $key . $value->build();
             } else {
                 $parts[] = self::buildSearchKV($key, $value);
             }
