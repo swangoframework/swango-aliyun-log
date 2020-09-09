@@ -27,15 +27,20 @@ class Client extends \BaseClient {
 
     /**
      *
-     * @var string aliyun sts token
-     */
-    protected $stsToken;
-
-    /**
-     *
      * @var string LOG host
      */
     protected static $host;
+    public static function setAliyunConfig(string $access_key_id, string $access_key_secret, string $host): void {
+        self::$accessKeyId = $access_key_id;
+        self::$accessKey = $access_key_secret;
+        self::$host = $host;
+    }
+
+    /**
+     *
+     * @var string aliyun sts token
+     */
+    protected $stsToken;
 
     /**
      *
@@ -146,7 +151,7 @@ class Client extends \BaseClient {
         if (isset($body)) {
             if (isset($headers['x-log-bodyrawsize']) == false)
                 $headers['x-log-bodyrawsize'] = 0;
-            $headers['Content-MD5'] = Util::calMD5($body->__toString());
+            $headers['Content-MD5'] = strtoupper(md5($body->__toString()));
         } else {
             $headers['x-log-bodyrawsize'] = 0;
         }
