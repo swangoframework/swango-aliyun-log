@@ -26,15 +26,6 @@ class Util {
     }
 
     /**
-     * Calculate string $value MD5.
-     *
-     * @return string
-     */
-    public static function calMD5(string $value): string {
-        return strtoupper(md5($value));
-    }
-
-    /**
      * Calculate string $content hmacSHA1 with secret key $key.
      *
      * @return string
