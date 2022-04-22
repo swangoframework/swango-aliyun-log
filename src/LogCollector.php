@@ -6,10 +6,10 @@ class LogCollector {
     private static bool $is_stopped = false;
     public static function start(int $concurrency = 8, int $queue_size = 128) {
         self::$channel = new \Swoole\Coroutine\Channel($queue_size);
-        \Swoole\Coroutine\parallel($concurrency, '\\SystemTool\\LogCollector::loop');
+        \Swoole\Coroutine\parallel($concurrency, '\\Swango\\Aliyun\\Log\\LogCollector::loop');
     }
     public static function stop() {
-        if (! self::$is_stopped) {
+        if (! self::$is_stopped && isset(self::$channel)) {
             self::$is_stopped = true;
             if (self::$channel->isEmpty()) {
                 self::$channel->close();
