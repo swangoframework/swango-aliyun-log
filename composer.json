@@ -6,7 +6,7 @@
 		"swoole"
 	],
 	"require" : {
-		"php": ">=7.1",
+		"php": ">=8.1",
 		"swango/aliyun-sts": "^1.0",
 		"swango/cache": "^1.0",
 		"swango/environment": "^1.0",
