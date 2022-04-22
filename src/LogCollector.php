@@ -3,17 +3,27 @@ namespace Swango\Aliyun\Log;
 use Swango\Aliyun\Log;
 class LogCollector {
     private static \Swoole\Coroutine\Channel $channel;
+    private static bool $is_stopped = false;
     public static function start(int $concurrency = 8, int $queue_size = 128) {
         self::$channel = new \Swoole\Coroutine\Channel($queue_size);
         \Swoole\Coroutine\parallel($concurrency, '\\SystemTool\\LogCollector::loop');
     }
     public static function stop() {
-        self::$channel->close();
+        if (! self::$is_stopped) {
+            self::$is_stopped = true;
+            if (self::$channel->isEmpty()) {
+                self::$channel->close();
+            }
+        }
     }
     public static function loop() {
         while (($request = self::$channel->pop()) instanceof Log\Models\Request\PutLogs) {
             self::sendLog($request);
             unset($request);
+            if (self::$is_stopped && self::$channel->isEmpty()) {
+                self::$channel->close();
+                break;
+            }
         }
     }
     public static function sendLog(Log\Models\Request\PutLogs $request): bool {
@@ -44,7 +54,7 @@ class LogCollector {
                                   string             $topic,
                                   Log\Models\LogItem ...$log_item): bool {
         $request = new Log\Models\Request\PutLogs($project, $log_store, $topic, logitems: $log_item);
-        if (isset(self::$channel)) {
+        if (isset(self::$channel) && ! self::$is_stopped) {
             $result = self::$channel->push($request, 0.001);
             if (! $result) {
                 trigger_error('Channel push error: ' . self::$channel->errCode);
