@@ -62,4 +62,7 @@ class PutLogs extends \Swango\Aliyun\Log\Client {
         ] = $this->send('POST', $project, $mem, $resource, $params, $headers);
         return new \Swango\Aliyun\Log\Models\Response\PutLogs($header);
     }
+    protected function writeLog(string &$log_string): void {
+        // Not write log because it's large and unreadable
+    }
 }
