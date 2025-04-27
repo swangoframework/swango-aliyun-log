@@ -56,7 +56,7 @@ class Statement implements \Iterator, \Countable {
             $this->current = null;
         return ! $this->finished;
     }
-    public function rewind() {
+    public function rewind(): void {
         if ($this->finished || $this->client === null)
             return;
 
@@ -76,7 +76,7 @@ class Statement implements \Iterator, \Countable {
             $this->current = $this->load_all_data->dequeue();
         }
     }
-    public function count() {
+    public function count(): int {
         if ($this->load_all_data->isEmpty())
             $this->rewind();
         return $this->load_all_data->count();
