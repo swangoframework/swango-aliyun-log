@@ -31,7 +31,7 @@ class Statement implements \Iterator, \Countable {
             return [];
         }
     }
-    public function current() {
+    public function current(): mixed {
         if (! isset($this->current))
             $this->rewind();
         // if (isset($this->current->scalar))
